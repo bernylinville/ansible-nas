@@ -2,6 +2,8 @@
 netdata_enabled: false
 netdata_available_externally: "false"
 
+netdata_docker_image: netdata/netdata
+
 # network
 netdata_hostname: "netdata"
 netdata_port: "19999"
