@@ -1,0 +1,52 @@
+---
+- name: Create rsshub Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  with_items:
+    - "{{ rsshub_data_directory }}"
+
+- name: browserless Docker Container
+  docker_container:
+    name: browserless
+    # image: "{{ rsshub_docker_image }}"
+    image: browserless/chrome:1.43-chrome-stable
+    pull: true
+    # ulimits:
+    #   - core:
+    #       hard: 0
+    #       soft: 0
+    memory: "{{ rsshub_browserless_memory }}"
+    restart_policy: always
+
+- name: redis Docker Container
+  docker_container:
+    name: redis
+    # image: "{{ rsshub_docker_image }}"
+    image: redis:alpine
+    pull: true
+    volumes:
+      - "{{ rsshub_data_directory }}/redis:/data:rw"
+    memory: "{{ rsshub_redis_memory }}"
+    restart_policy: always
+
+- name: rsshub Docker Container
+  docker_container:
+    name: rsshub
+    # image: "{{ rsshub_docker_image }}"
+    image: diygod/rsshub
+    pull: true
+    links:
+      - redis:redis
+      - browserless:browserless
+    ports:
+      - "12000:1200"
+    env:
+      NODE_ENV: production
+      CACHE_TYPE: redis
+      REDIS_URL: "redis://redis:6379/"
+      PUPPETEER_WS_ENDPOINT: "ws://browserless:3000"
+      TZ: "{{ ansible_nas_timezone }}"
+    memory: "{{ rsshub_memory }}"
+    restart_policy: unless-stopped

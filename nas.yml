@@ -300,6 +300,16 @@
         - qbittorrentee
       when: (qbittorrentee_enabled | default(False))
 
+    - role: freshrss
+      tags:
+        - freshrss
+      when: (freshrss_enabled | default(False))
+
+    - role: rsshub
+      tags:
+        - rsshub
+      when: (rsshub_enabled | default(False))
+
   tasks:
     - import_tasks: tasks/thelounge.yml
       when: (thelounge_enabled | default(False))

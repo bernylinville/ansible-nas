@@ -1,0 +1,16 @@
+---
+rsshub_enabled: false
+rsshub_available_externally: "false"
+rsshub_data_directory: "{{ docker_home }}/rsshub"
+# rsshub_port: "8082"
+# rsshub_hostname: "rsshub"
+# rsshub_docker_image: rsshub/rsshub:1.19.1
+
+# rsshub_db_user: rsshub
+# rsshub_db_password: rsshub
+# rsshub_db_name: rsshub
+
+# specs
+rsshub_memory: 1g
+rsshub_browserless_memory: 1g
+rsshub_redis_memory: 1g
