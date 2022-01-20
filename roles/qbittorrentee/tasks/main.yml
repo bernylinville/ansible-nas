@@ -1,0 +1,42 @@
+---
+- name: Create Qbittorrentee Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    # mode: 0755
+  with_items:
+    - "{{ qbittorrentee_config_directory }}"
+    - "{{ qbittorrentee_download_directory }}"
+    - "{{ qbittorrentee_movie_directory }}"
+    - "{{ qbittorrentee_tv_directory }}"
+    # - "{{ qbittorrentee_watch_directory }}"
+
+- name: Qbittorrentee Docker Container
+  docker_container:
+    name: qbittorrentee
+    image: "{{ qbittorrentee_docker_image }}"
+    pull: true
+    volumes:
+      - "{{ qbittorrentee_config_directory }}:/config:rw"
+      - "{{ qbittorrentee_download_directory }}:/downloads:rw"
+      - "{{ qbittorrentee_movie_directory }}:/movies:rw"
+      - "{{ qbittorrentee_tv_directory }}:/tv:rw"
+      # - "{{ qbittorrentee_watch_directory }}:/watch:rw"
+    ports:
+      - "{{ qbittorrentee_webui_port }}:8080"
+      - "{{ qbittorrentee_external_port }}:16882"
+      - "{{ qbittorrentee_external_port }}:16882/udp"
+    env:
+      TZ: "{{ qbittorrentee_timezone }}"
+      PUID: "{{ qbittorrentee_user_id }}"
+      PGID: "{{ qbittorrentee_group_id }}"
+      # WEBUI_PORT: "{{ qbittorrentee_webui_port }}"
+    restart_policy: unless-stopped
+    memory: "{{ qbittorrentee_memory }}"
+    labels:
+      traefik.enable: "{{ qbittorrentee_available_externally }}"
+      traefik.http.routers.qbittorrentee.rule: "Host(`{{ qbittorrentee_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.qbittorrentee.tls.certresolver: "letsencrypt"
+      traefik.http.routers.qbittorrentee.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.qbittorrentee.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.qbittorrentee.loadbalancer.server.port: "8080"

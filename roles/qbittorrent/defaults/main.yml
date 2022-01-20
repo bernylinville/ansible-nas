@@ -1,0 +1,27 @@
+---
+qbittorrent_enabled: false
+qbittorrent_available_externally: "false"
+
+# directories
+qbittorrent_config_directory: "{{ docker_home }}/qbittorrent/config"
+qbittorrent_download_directory: "{{ downloads_root }}"
+qbittorrent_movie_directory: "{{ movies_root }}"
+qbittorrent_tv_directory: "{{ tv_root }}"
+
+qbittorrent_docker_image: linuxserver/qbittorrent:latest
+
+# qbittorrent_watch_directory: "{{ torrents_root }}"
+
+# uid / gid
+qbittorrent_user_id: "1000"
+qbittorrent_group_id: "1000"
+
+# network
+qbittorrent_webui_port: "8081"
+qbittorrent_external_port: "16881"
+qbittorrent_hostname: "qbittorrent"
+
+qbittorrent_timezone: "{{ ansible_nas_timezone }}"
+
+# specs
+qbittorrent_memory: 1g
