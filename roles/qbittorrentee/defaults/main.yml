@@ -13,8 +13,10 @@ qbittorrentee_docker_image: superng6/qbittorrentee
 # qbittorrentee_watch_directory: "{{ torrents_root }}"
 
 # uid / gid
-qbittorrentee_user_id: "1026"
-qbittorrentee_group_id: "100"
+# qbittorrentee_user_id: "1026"
+qbittorrentee_user_id: "0"
+# qbittorrentee_group_id: "100"
+qbittorrentee_group_id: "0"
 
 # network
 qbittorrentee_webui_port: "8080"
