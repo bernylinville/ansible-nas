@@ -38,6 +38,8 @@
       MYSQL_USER: "gitea"
       MYSQL_PASSWORD: "gitea"
       MYSQL_ROOT_PASSWORD: "gitea"
+      USER_UID: "1309"
+      USER_GID: "1309"
     restart_policy: unless-stopped
     memory: "{{ gitea_mysql_memory }}"
 

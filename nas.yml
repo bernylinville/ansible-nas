@@ -310,6 +310,11 @@
         - rsshub
       when: (rsshub_enabled | default(False))
 
+    - role: photoprism
+      tags:
+        - photoprism
+      when: (photoprism_enabled | default(False))
+
   tasks:
     - import_tasks: tasks/thelounge.yml
       when: (thelounge_enabled | default(False))

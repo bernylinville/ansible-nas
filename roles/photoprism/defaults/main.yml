@@ -1,0 +1,25 @@
+---
+photoprism_enabled: false
+photoprism_available_externally: "false"
+photoprism_data_directory: "{{ docker_home }}/photoprism"
+photoprism_port: "2342"
+photoprism_hostname: "photoprism"
+
+photoprism_db_docker_image: mariadb:10.6
+photoprism_docker_image: photoprism/photoprism:latest
+
+photoprism_db_user: photoprism
+photoprism_db_password: photoprism
+photoprism_db_name: photoprism
+
+photoprism_admin_password: photoprism
+
+# uid / gid
+# photoprism_user_id: "1026"
+photoprism_user_id: "0"
+# photoprism_group_id: "100"
+photoprism_group_id: "0"
+
+# specs
+photoprism_memory: 1g
+photoprism_db_memory: 1g

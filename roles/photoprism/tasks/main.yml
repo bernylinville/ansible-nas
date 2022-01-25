@@ -1,0 +1,85 @@
+---
+- name: Create photoprism Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  with_items:
+    - "{{ photoprism_data_directory }}"
+
+- name: photoprism DB Container
+  docker_container:
+    name: photoprism-db
+    image: "{{ photoprism_db_docker_image }}"
+    pull: true
+    security_opts:
+      - "seccomp:unconfined"
+      -  "apparmor:unconfined"
+    command: mysqld --innodb-buffer-pool-size=128M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
+    volumes:
+      - "{{ photoprism_data_directory }}/db:/var/lib/mysql:rw"
+    env:
+      MYSQL_USER: "{{ photoprism_db_user }}"
+      MYSQL_PASSWORD: "{{ photoprism_db_password }}"
+      MYSQL_ROOT_PASSWORD: "{{ photoprism_db_password }}"
+      MYSQL_DATABASE: "{{ photoprism_db_name }}"
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+    memory: "{{ photoprism_db_memory }}"
+
+- name: photoprism Docker Container
+  docker_container:
+    name: photoprism
+    image: "{{ photoprism_docker_image }}"
+    pull: true
+    links:
+      - photoprism-db:db
+    security_opts:
+      - "seccomp:unconfined"
+      -  "apparmor:unconfined"
+    ports:
+      - "{{ photoprism_port }}:2342"
+    volumes:
+      - "{{ photoprism_data_directory }}/Pictures:/photoprism/originals:rw"
+      - "{{ photoprism_data_directory }}/storage:/photoprism/storage:rw"
+    env:
+      PHOTOPRISM_ADMIN_PASSWORD: "{{ photoprism_admin_password }}"
+      PHOTOPRISM_SITE_URL: "https://photoprism.{{ ansible_nas_domain }}"
+      PHOTOPRISM_ORIGINALS_LIMIT: "5000"
+      PHOTOPRISM_HTTP_COMPRESSION: "gzip"            # Improves transfer speed and bandwidth utilization (none or gzip)
+      PHOTOPRISM_DEBUG: "false"                      # Run in debug mode (shows additional log messages)
+      PHOTOPRISM_PUBLIC: "false"                     # No authentication required (disables password protection)
+      PHOTOPRISM_READONLY: "false"                   # Don't modify originals directory (reduced functionality)
+      PHOTOPRISM_EXPERIMENTAL: "false"               # Enables experimental features
+      PHOTOPRISM_DISABLE_CHOWN: "false"              # Disables storage permission updates on startup
+      PHOTOPRISM_DISABLE_WEBDAV: "false"             # Disables built-in WebDAV server
+      PHOTOPRISM_DISABLE_SETTINGS: "false"           # Disables Settings in Web UI
+      PHOTOPRISM_DISABLE_TENSORFLOW: "false"         # Disables all features depending on TensorFlow
+      PHOTOPRISM_DISABLE_FACES: "false"              # Disables facial recognition
+      PHOTOPRISM_DISABLE_CLASSIFICATION: "false"     # Disables image classification
+      PHOTOPRISM_DARKTABLE_PRESETS: "false"          # Enables Darktable presets and disables concurrent RAW conversion
+      PHOTOPRISM_DETECT_NSFW: "false"                # Flag photos as private that MAY be offensive (requires TensorFlow)
+      PHOTOPRISM_UPLOAD_NSFW: "true"                 # Allow uploads that MAY be offensive
+      PHOTOPRISM_DATABASE_DRIVER: "mysql"            # Use MariaDB 10.5+ or MySQL 8+ instead of SQLite for improved performance
+      PHOTOPRISM_DATABASE_SERVER: "db:3306"     # MariaDB or MySQL database server (hostname:port)
+      PHOTOPRISM_DATABASE_NAME: "{{ photoprism_db_name }}"      # MariaDB or MySQL database schema name
+      PHOTOPRISM_DATABASE_USER: "{{ photoprism_db_user }}"        # MariaDB or MySQL database user name
+      PHOTOPRISM_DATABASE_PASSWORD: "{{ photoprism_db_password }}"      # MariaDB or MySQL database user password
+      PHOTOPRISM_SITE_TITLE: "PhotoPrism"
+      PHOTOPRISM_SITE_CAPTION: "Browse Your Life"
+      PHOTOPRISM_SITE_DESCRIPTION: ""
+      PHOTOPRISM_SITE_AUTHOR: ""
+      PUID: "{{ photoprism_user_id }}"
+      PGID: "{{ photoprism_group_id }}"
+      HOME: "/photoprism"
+      TZ: "{{ ansible_nas_timezone }}"
+    working_dir: "/photoprism"
+    labels:
+      traefik.enable: "{{ photoprism_available_externally }}"
+      traefik.http.routers.photoprism.rule: "Host(`{{ photoprism_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.photoprism.tls.certresolver: "letsencrypt"
+      traefik.http.routers.photoprism.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.photoprism.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.photoprism.loadbalancer.server.port: "2342"
+    memory: "{{ photoprism_memory }}"
+    restart_policy: unless-stopped
