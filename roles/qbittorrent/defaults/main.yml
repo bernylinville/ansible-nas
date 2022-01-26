@@ -13,8 +13,8 @@ qbittorrent_docker_image: linuxserver/qbittorrent:latest
 # qbittorrent_watch_directory: "{{ torrents_root }}"
 
 # uid / gid
-qbittorrent_user_id: "1000"
-qbittorrent_group_id: "1000"
+qbittorrent_user_id: "0"
+qbittorrent_group_id: "0"
 
 # network
 qbittorrent_webui_port: "8081"
