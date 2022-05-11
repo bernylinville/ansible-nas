@@ -3,14 +3,14 @@
   file:
     path: "{{ item }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   with_items:
     - "{{ bitwarden_data_directory }}"
 
 - name: Bitwarden Docker Container
   docker_container:
     name: bitwarden
-    image: bitwardenrs/server:latest
+    image: "vaultwarden/server:{{ bitwarden_version }}"
     pull: true
     ports:
       - "{{ bitwarden_port_a }}:80"
@@ -39,7 +39,7 @@
       traefik.http.routers.bitwarden-ws.middlewares: "bitwarden-ipwhitelist@docker"
       traefik.http.services.bitwarden-ws.loadbalancer.server.port: "3012"
       traefik.http.middlewares.bitwarden-ipwhitelist.ipwhitelist.sourcerange: "{{ bitwarden_ip_whitelist }}"
-    memory: "{{ bitwarden_memory }}"
+    # memory: "{{ bitwarden_memory }}"
     restart_policy: unless-stopped
 
 - name: Bitwarden Backup Container
@@ -49,4 +49,4 @@
     pull: true
     restart_policy: unless-stopped
     volumes_from: bitwarden
-    memory: "{{ bitwarden_backup_memory }}"
+    # memory: "{{ bitwarden_backup_memory }}"

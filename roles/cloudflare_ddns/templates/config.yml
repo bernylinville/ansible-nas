@@ -4,6 +4,15 @@ auth:
 domains:
   - name: "{{ cloudflare_host }}"
     type: "{{ cloudflare_type }}"
-    proxied: {{ cloudflare_proxy | bool }}
+    proxied: false
     create: true
     zoneName: "{{ cloudflare_zone }}"
+ipv4:
+  - type: json
+    url: https://v4.ident.me/.json
+    fields:
+      - address
+  - type: json
+    url: https://api.ipify.org?format=json
+    fields:
+      - ip

@@ -1,0 +1,24 @@
+---
+qbittorrentee_enabled: false
+qbittorrentee_available_externally: "false"
+
+# directories
+qbittorrentee_config_directory: "{{ docker_home }}/qbittorrentee/config"
+qbittorrentee_download_directory: "{{ downloads_root }}"
+qbittorrentee_watch_directory: "{{ torrents_root }}"
+
+qbittorrentee_version: 4.4.2.10
+
+# uid / gid
+qbittorrentee_user_id: "1000"
+qbittorrentee_group_id: "1000"
+
+# network
+qbittorrentee_webui_port: "8081"
+qbittorrentee_external_port: "16882"
+qbittorrentee_hostname: "qbittorrentee"
+
+qbittorrentee_timezone: "{{ ansible_nas_timezone }}"
+
+# specs
+qbittorrentee_memory: 1g

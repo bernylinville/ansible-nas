@@ -6,7 +6,6 @@
       tags: users
 
   roles:
-
     ###
     ### Requirements
     ###
@@ -25,7 +24,6 @@
         - docker
         - skip_ansible_lint
 
-
     ###
     ### Ansible-NAS Roles
     ###
@@ -38,7 +36,6 @@
       tags:
         - ansible-nas-docker
         - ansible-nas
-
 
     ###
     ### Applications
@@ -302,6 +299,16 @@
       tags:
         - piwigo
       when: (piwigo_enabled | default(False))
+
+    - role: qbittorrent
+      tags:
+        - qbittorrent
+      when: (qbittorrent_enabled | default(False))
+
+    - role: qbittorrentee
+      tags:
+        - qbittorrentee
+      when: (qbittorrentee_enabled | default(False))
 
   tasks:
     - import_tasks: tasks/thelounge.yml
